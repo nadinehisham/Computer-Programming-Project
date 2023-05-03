@@ -1,0 +1,298 @@
+#include <iostream>
+#include <cstring>
+#include <cmath>
+#include<string>
+#include<cstdlib>
+#include<complex>
+
+//This a calculator that finds the all the roots (real and complex ones) of max a 5th degree quintic equation prepared by Habiba Yasser, Nadine Hisham , and Jumana Yasser
+using namespace std;
+
+void frthorder(double a, double b, double c, double d, double e);
+void thrdorder(double a, double b, double c, double d);
+void scndorder(double a, double b, double c);
+void frstorder(double a, double b);
+
+
+const double PI = 3.141592653589793;
+int main()
+{
+int x;
+int degree;
+bool error1, error2, error3, error4;
+cout << "Insert your polynomial in terms of x:\n";
+cout << "Example: 5x^3 -x^2 +2.5x +1\n";
+char str[1000];
+cin.getline(str, 1000);
+
+// error 1
+for (int i = 0; i < 1000; i++)
+{
+if (str[i] == NULL && (str[i - 1] == '+' || str[i - 1] == '-'))
+{
+error1 = 1;
+break;
+}
+
+ else
+{
+error1 = 0;
+}
+}
+
+ // error 2
+for (int i = 0; i < 1000; i++)
+{
+if (str[i] == '^')
+{
+if (!(str[++i] >= '0' && str[++i] <= '5'))
+{
+error2 = 1;
+break;
+}
+else error2 = 0;
+}
+}
+// error 3
+for (int i = 0; i < 1000; i++)
+{
+if (str[i] == 'x')
+{
+if (str[++i] >= '0' && str[i] <= '9')
+{
+error3 = 1;
+break;
+}
+else error3 = 0;
+}
+}
+
+
+ if (error1 == 1 || error2 == 1 || error3 == 1 )
+{
+cout << "Error. Rewrite the equation as shown in the example\n";
+system("pause");
+}
+
+ for (int i = 0; i < 1000; i++)
+{
+
+ if (str[i] == '^')
+{
+i++;
+x = i;
+degree = str[x] - '0';
+break;
+}
+else if ((str[i] == 'x' && (str[i + 1] == '+' || str[i + 1] == '-')) || (str[i] == 'x' && (str[i + 1] == ' ' && (str[i + 2] == '+' || str[i + 2] == '-'))))
+{
+x = 1;
+degree = x;
+break;
+}
+}
+cout << "degree:" << degree << "\n";
+
+ int size = degree + 1;
+float* coeff = new float[size];
+
+ //coefficients
+char* token;
+double y;
+token = strtok(str, "+ ");
+y = atof(token);
+while (token != NULL)
+{
+for (int i = 0; i < size; i++)
+{
+
+ y = atof(token);
+
+ if (*token == '-' && *(token + 1) == 'x')
+{
+y = -1;
+}
+
+ else if (*token == '-')
+{
+y = atof(token);
+
+ }
+else if (*token == 'x')
+{
+y = 1;
+
+ }
+cout << "coefficient:" << y << "\n";
+coeff[i] = y;
+token = strtok(NULL, "+ ");
+}
+}
+
+switch (degree)
+{
+case 1:
+frstorder(coeff[0], coeff[1]);
+break;
+case 2:
+scndorder(coeff[0], coeff[1], coeff[2]);
+break;
+case 3:
+thrdorder(coeff[0], coeff[1], coeff[2], coeff[3]);
+break;
+case 4:
+frthorder(coeff[0], coeff[1], coeff[2], coeff[3], coeff[4]);
+break;
+case 5:
+complex<double> p, q, r, s, t;
+complex<double> seed = 0.4 + 0.9i;
+complex<double> a = coeff[0];
+complex<double> b = coeff[1];
+complex<double> c = coeff[2];
+complex<double> d = coeff[3];
+complex<double> e = coeff[4];
+complex<double> f = coeff[5];
+p = 1.0;
+q = p * seed;
+r = q * seed;
+s = r * seed;
+t = s * seed;
+//cout << p << " , " << q << " , " << r << " , " << s << " , " << t << "\n";
+
+ for (int i = 0; i < 3000; ++i)
+{
+p = p - ((p * (p * (p * (p * (a*p + b) + c) + d) + e) + f) / a) / ((p - q) * (p - r) * (p - s) * (p - t));
+q = q - ((q * (q * (q * (q * (a * q + b) + c) + d) + e) + f) / a) / ((q - p) * (q - r) * (q - s) * (q - t));
+r = r - ((r * (r * (r * (r * (a * r + b) + c) + d) + e) + f) / a) / ((r - p) * (r - q) * (r - s) * (r - t));
+s = s - ((s * (s * (s * (s * (a * s + b) + c) + d) + e) + f) / a) / ((s - p) * (s - q) * (s - r) * (s - t));
+t = t - ((t * (t * (t * (t * (a * t + b) + c) + d) + e) + f) / a) / ((t - p) * (t - q) * (t - r) * (t - s));
+
+ }
+cout << "x1: " << p << "\n";
+cout << "x2: " << q << "\n";
+cout << "x3: " << r << "\n";
+cout << "x4: " << s << "\n";
+cout << "x5: " << t << "\n";
+
+ break;
+
+ }
+
+delete[] coeff;
+coeff = NULL;
+}
+
+void frstorder(double a, double b)
+{
+double x1 = -1 * (b / a);
+cout << "x1: " << x1 << "\n";
+}
+
+void scndorder(double a, double b, double c)
+{
+double discriminant, realroot, imaginaryroot, x1, x2;
+
+discriminant = b * b - 4 * a * c;
+
+ if (discriminant > 0)
+{
+x1 = (-b + sqrt(discriminant)) / (2 * a);
+x2 = (-b - sqrt(discriminant)) / (2 * a);
+
+ cout << "x1 = " << x1 << "\n";
+cout << "x2 = " << x2 << "\n";
+}
+
+ else if (discriminant == 0)
+{
+
+ x1 = -b / (2 * a);
+cout << "x1 :" << x1 << "\n";
+cout << "x2 :" << x1 << "\n";
+}
+
+ else
+{
+realroot = -b / (2 * a);
+imaginaryroot = sqrt(-discriminant) / (2 * a);
+
+ cout << "x1 : " << realroot << "+" << imaginaryroot << "i\n";
+cout << "x2 : " << realroot << "-" << imaginaryroot << "i\n";
+
+ }
+}
+void thrdorder(double a, double b, double c, double d)
+
+{
+double discriminant, x1, x2, x3;
+
+ double p = (b * b - 3 * a * c) / (9 * a * a);
+double q = (9 * a * b * c - 27 * a * a * d - 2 * b * b * b) / (54 * a * a * a);
+double sabet = b / (3 * a);
+
+ // discriminant
+discriminant = p * p * p - q * q;
+
+ if (discriminant > 0)
+{
+double angle = acos(q / (p * sqrt(p)));
+double r = 2 * sqrt(p);
+for (int n = 0; n < 3; n++)
+cout << r * cos((angle + 2 * n * PI) / 3.0) - sabet << "\n";
+}
+else
+{
+double angle1 = cbrt(q + sqrt(-discriminant));
+double angle2 = cbrt(q - sqrt(-discriminant));
+
+ x1 = angle1 + angle2 - sabet;
+cout << angle1 + angle2 - sabet<< "\n";
+
+ double realpart = -0.5 * (angle1 + angle2) - sabet;
+double imaginarypart = (angle1 - angle2) * sqrt(3) / 2;
+if (discriminant == 0)
+{
+cout << realpart << "\n";
+cout << realpart << "\n";
+}
+else
+{
+cout <<realpart << " + " << imaginarypart << " i \n";
+cout <<realpart << " - " << imaginarypart << " i \n";
+}
+}
+}
+
+void frthorder(double a, double b, double c, double d, double e)
+
+{
+complex<double> x1, x2, x3, x4, p1, p2, p3, p4, p5, p6;
+
+p1 = 2.0 * c * c * c - 9.0 * b * c * d + 27.0 * a * d * d + 27.0 * b * b * e - 72.0 * a * c * e;
+
+ p2 = p1 + sqrt(complex<double>(-4.0 * (pow(c * c - 3.0 * b * d + 12.0 * a * e, 3.0)) + p1 * p1));
+
+ p3 = (pow(c, 2.0) - 3.0 * b * d + 12.0 * a * e) / (3.0 * a * pow((p2 / 2.0), (1.0 / 3.0))) + (pow((p2 / 2.0), (1.0 / 3.0))) / (3.0 * a);
+
+ p4 = sqrt(complex<double>((pow(b, 2.0)) / (4.0 * pow(a, 2)) - ((2.0 * c) / (3.0 * a)) + p3));
+
+ p5 = pow(b, 2.0) / (2.0 * pow(a, 2.0)) - (4.0 * c) / (3.0 * a) - p3;
+
+ p6 = (-(pow(b, 3.0) / pow(a, 3.0)) + (4.0 * b * c) / pow(a, 2.0) - ((8.0 * d) / a)) / (4.0 * p4);
+
+ x1 = -(b / (4.0 * a)) - (p4 / 2.0) - (sqrt(complex<double>(p5 - p6))) / 2.0;
+
+ x2 = -(b / (4.0 * a)) - (p4 / 2.0) + (sqrt(complex<double>(p5 - p6))) / 2.0;
+
+ x3 = -(b / (4.0 * a)) + (p4 / 2.0) - (sqrt(complex<double>(p5 + p6))) / 2.0;
+
+ x4 = -(b / (4.0 * a)) + (p4 / 2.0) + (sqrt(complex<double>(p5 + p6))) / 2.0;
+
+cout << "Root Format: (real,imaginary) \n";
+cout << "Note: if the root is real the answer will be shown as follows : (real,0) \n";
+cout << "x1: " << x1 << "\n";
+cout << "x2: " << x2 << "\n";
+cout << "x3: " << x3 << "\n";
+cout << "x4: " << x4 << "\n";
+
+}
